@@ -1,0 +1,168 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'java-library'
+	id 'pmd'
+  id 'com.github.spotbugs' version '4.7.2'
+  id 'checkstyle'
+  id 'com.diffplug.spotless' version '5.14.2'
+  id 'project-report'
+  id 'jacoco'
+}
+
+group = 'org.sky'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_11
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	// implementation 'org.springframework.boot:spring-boot-starter-batch'
+	// implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	// implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-integration'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	// implementation 'org.springframework.integration:spring-integration-r2dbc'
+	// implementation 'org.springframework.integration:spring-integration-redis'
+	implementation 'org.springframework.integration:spring-integration-webflux'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	// runtimeOnly 'com.h2database:h2'
+	// runtimeOnly 'io.r2dbc:r2dbc-h2'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+	// testImplementation 'org.springframework.batch:spring-batch-test'
+	testImplementation 'org.springframework.integration:spring-integration-test'
+
+	// modelmapper
+  implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.8'
+
+  // thymeleaf
+  // implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+  implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+  // modelmapper
+  implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.8'
+
+  // その他プラグイン
+  implementation 'org.apache.commons:commons-lang3:3.11'
+  implementation 'org.apache.commons:commons-math3:3.6.1'
+  implementation 'org.apache.commons:commons-csv:1.8'
+  implementation 'org.apache.commons:commons-collections4:4.4'
+  implementation 'commons-io:commons-io:2.7'
+
+  // webjars
+  implementation 'org.webjars:webjars-locator:0.32'
+  implementation 'org.webjars:bootstrap:4.5.2'
+  implementation 'org.webjars:bootstrap-datepicker:1.9.0'
+  implementation 'org.webjars:jquery:3.5.1'
+  implementation 'org.webjars:jquery-cookie:1.4.1-1'
+  // implementation 'org.webjars:jquery-ui:1.12.1'
+  implementation 'org.webjars:font-awesome:5.15.0'
+  implementation 'org.webjars:sockjs-client:1.1.2'
+  implementation 'org.webjars:stomp-websocket:2.3.3-1'
+
+}
+
+test {
+	jvmArgs = ['-Dspring.profiles.active=dev']
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+pmd {
+  toolVersion = '6.30.0'
+  ignoreFailures = true
+}
+
+pmdMain {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+  exclude '**/common/constants/**'
+  exclude '**/dao/entity/**'
+  exclude '**/form/**'
+  exclude '**/service/dto/**'
+}
+
+checkstyle {
+  toolVersion = '8.38'
+  configFile = file("${rootProject.projectDir}/config/checkstyle/google_checks.xml")
+  ignoreFailures = true
+  showViolations = false
+}
+
+checkstyleMain {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+  exclude '**/common/constants/**'
+  exclude '**/dao/entity/**'
+  exclude '**/form/**'
+  exclude '**/service/dto/**'
+}
+
+spotbugs {
+  toolVersion = '4.2.0'
+  ignoreFailures = true
+  showStackTraces = false
+}
+
+spotbugsMain {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+
+spotless {
+  java {
+    target project.fileTree(project.rootDir) {
+      include '**/*.java'
+      exclude '**/common/constants/**'
+      exclude '**/dao/entity/**'
+      exclude '**/form/**'
+      exclude '**/service/dto/**'
+    }
+    googleJavaFormat()
+    // prettier(['prettier': '2.2.0', 'prettier-plugin-java': '1.0.0']).config(['parser': 'java', 'tabWidth': 2])
+  }
+}
+
+javadoc {
+  options.charSet = 'UTF-8'
+  options.encoding = 'UTF-8'
+  destinationDir = file("$buildDir/reports/javadoc")
+  failOnError = false
+}
+
+jacoco {
+  toolVersion = '0.8.6'
+  reportsDir = file("$buildDir/reports/jacoco")
+}
+
+jacocoTestReport {
+  dependsOn test
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
